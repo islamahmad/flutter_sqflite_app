@@ -63,7 +63,7 @@ class DbHelper {
   Future<int> deleteUser(User user) async {
     var dbClient = await db;
     int result = await dbClient.delete(tableName,
-        where: '$columnName = ?', whereArgs: user.toMap()["name"]);
+        where: '$columnID = ?', whereArgs: user.toMap()["id"]);
     String Sql = "";
     return result;
   }
@@ -80,5 +80,13 @@ class DbHelper {
     String Sql = "SELECT * FROM $tableName";
     Future<List> users = dbClient.rawQuery(Sql);
     return users;
+  }
+
+  Future<int> getUsersCount() async {
+    var dbClient = await db;
+    String Sql = "SELECT COUNT(1) FROM $tableName";
+    List result = await dbClient.rawQuery(Sql);
+    int count = Sqflite.firstIntValue(result);
+    return count;
   }
 }
