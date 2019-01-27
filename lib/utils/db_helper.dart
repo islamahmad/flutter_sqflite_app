@@ -60,10 +60,10 @@ class DbHelper {
     return result;
   }
 
-  Future<int> deleteUser(User user) async {
+  Future<int> deleteUser(int id) async {
     var dbClient = await db;
-    int result = await dbClient.delete(tableName,
-        where: '$columnID = ?', whereArgs: user.toMap()["id"]);
+    int result = await dbClient
+        .delete(tableName, where: '$columnID = ?', whereArgs: [id]);
     String Sql = "";
     return result;
   }
