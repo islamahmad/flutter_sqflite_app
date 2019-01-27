@@ -47,27 +47,38 @@ class DbHelper {
   Future<int> saveUser(User user) async {
     var dbClient = await db;
     int result;
-//    String Sql = "INSERT INTO $tableName "; // if we want to create the query manually
-    // if you want to create the map manually
-    Map newUser = {"name": "islam", "pass": "123"};
+    //String Sql = "INSERT INTO $tableName "; // if we want to create the query manually
+    //if you want to create the map manually
+    //Map newUser = {"name": "islam", "pass": "123"};
     result = await dbClient.insert(tableName, user.toMap());
+    return result;
   }
 
   Future<int> updateUser(User user) async {
     var dbClient = await db;
-    int result;
-    String Sql = "";
+    int result = await dbClient.update(tableName, user.toMap());
+    return result;
   }
 
   Future<int> deleteUser(User user) async {
     var dbClient = await db;
-    int result;
+    int result = await dbClient.delete(tableName,
+        where: '$columnName = ?', whereArgs: user.toMap()["name"]);
     String Sql = "";
+    return result;
   }
 
   Future<User> retrieveUser() async {
     var dbClient = await db;
     int result;
     String Sql = "";
+    //return result;
+  }
+
+  Future<List> getAllUsers() async {
+    var dbClient = await db;
+    String Sql = "SELECT * FROM $tableName";
+    Future<List> users = dbClient.rawQuery(Sql);
+    return users;
   }
 }
