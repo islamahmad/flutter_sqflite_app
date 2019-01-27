@@ -68,24 +68,31 @@ class DbHelper {
     return result;
   }
 
-  Future<User> retrieveUser() async {
+  Future<User> retrieveUser(int id) async {
     var dbClient = await db;
-    int result;
-    String Sql = "";
-    //return result;
+    String Sql = "SELECT * FROM $tableName WHERE $columnID = $id";
+    var result = await dbClient.rawQuery(Sql);
+    if (result.length != 0) {
+      User user = User.fromMap(result.first);
+      // used first as in the video and it removed the error where
+      // the SDK showed future<List<Map<String, dynamic>>> cannot be used as a Map
+      return user;
+    } else {
+      return null;
+    }
   }
 
   Future<List> getAllUsers() async {
     var dbClient = await db;
     String Sql = "SELECT * FROM $tableName";
-    Future<List> users = dbClient.rawQuery(Sql);
+    var users = await dbClient.rawQuery(Sql);
     return users;
   }
 
   Future<int> getUsersCount() async {
     var dbClient = await db;
     String Sql = "SELECT COUNT(1) FROM $tableName";
-    List result = await dbClient.rawQuery(Sql);
+    var result = await dbClient.rawQuery(Sql);
     int count = Sqflite.firstIntValue(result);
     return count;
   }
