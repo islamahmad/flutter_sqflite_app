@@ -21,7 +21,7 @@ class DbHelper {
   final String columnID = "ID";
   final String columnName = "userName";
   final String columnPass = "password";
-  static Database _db;
+  static Database _db; // this is the database that we will use,
 
   Future<Database> get db async {
     if (_db != null) {
@@ -45,18 +45,29 @@ class DbHelper {
   }
 
   Future<int> saveUser(User user) async {
-    String Sql = "INSERT INTO $tableName ";
+    var dbClient = await db;
+    int result;
+//    String Sql = "INSERT INTO $tableName "; // if we want to create the query manually
+    // if you want to create the map manually
+    Map newUser = {"name": "islam", "pass": "123"};
+    result = await dbClient.insert(tableName, user.toMap());
   }
 
   Future<int> updateUser(User user) async {
+    var dbClient = await db;
+    int result;
     String Sql = "";
   }
 
   Future<int> deleteUser(User user) async {
+    var dbClient = await db;
+    int result;
     String Sql = "";
   }
 
   Future<User> retrieveUser() async {
+    var dbClient = await db;
+    int result;
     String Sql = "";
   }
 }
