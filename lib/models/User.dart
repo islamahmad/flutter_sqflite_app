@@ -1,29 +1,29 @@
 class User {
-  String _name;
-  String _pass;
+  String _userName;
+  String _password;
   int _id;
-  User(this._name, this._pass);
+  User(this._userName, this._password);
   User.map(dynamic obj) {
-    this._name = obj["name"];
-    this._pass = obj["pass"];
+    this._userName = obj["userName"];
+    this._password = obj["password"];
     this._id = obj["id"];
   }
   User.fromMap(Map<String, dynamic> map) {
-    this._name = map["name"];
-    this._pass = map["pass"];
+    this._userName = map["userName"];
+    this._password = map["password"];
     if (map["id"] != null) {
       this._id = map["id"];
     }
   }
-  String get name => _name;
+  String get name => _userName;
   int get id => _id;
-  String get pass => _pass;
+  String get pass => _password;
   set name(String value) {
-    _name = value;
+    _userName = value;
   }
 
-  set pass(String value) {
-    _pass = value;
+  set password(String value) {
+    _password = value;
   }
 
   set id(int value) {
@@ -32,10 +32,10 @@ class User {
 
   Map<String, dynamic> toMap() {
     Map map = Map<String, dynamic>();
-    map["name"] = _name;
-    map["pass"] = _pass;
+    map["userName"] = this._userName;
+    map["password"] = this._password;
     if (id != null) {
-      map["id"] = _id;
+      map["id"] = this._id;
     }
     return map;
   }

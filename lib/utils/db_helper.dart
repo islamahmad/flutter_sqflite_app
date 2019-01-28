@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_app/models/User.dart';
 
 class DbHelper {
-  // this is a sinlge instance from this class that will be used everywhere
+  // this is a single instance from this class that will be used everywhere
   // this class is using the singleton design pattern
   static final DbHelper _instance = DbHelper.internal();
   // the internal named constructor is a convention that is used when you want
@@ -34,14 +34,14 @@ class DbHelper {
 
   Future<Database> initDB() async {
     Directory documentDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentDirectory.path, "mydb.db");
+    String path = join(documentDirectory.path, "my_db.db");
     Database newDB = await openDatabase(path, version: 1, onCreate: _onCreate);
     return newDB;
   }
 
   void _onCreate(Database db, int newVersion) async {
     await db.execute(
-        "CREATE TABEL $tableName ($columnID INTEGER PRIMARY KEY , $columnName TEXT , $columnPass TEXT)");
+        "CREATE TABLE $tableName ($columnID INTEGER PRIMARY KEY , $columnName TEXT , $columnPass TEXT)");
   }
 
   Future<int> saveUser(User user) async {
@@ -56,7 +56,8 @@ class DbHelper {
 
   Future<int> updateUser(User user) async {
     var dbClient = await db;
-    int result = await dbClient.update(tableName, user.toMap());
+    int result = await dbClient.update(tableName, user.toMap(),
+        where: '$columnID = ?', whereArgs: [user.id]);
     return result;
   }
 
@@ -73,10 +74,13 @@ class DbHelper {
     String Sql = "SELECT * FROM $tableName WHERE $columnID = $id";
     var result = await dbClient.rawQuery(Sql);
     if (result.length != 0) {
-      User user = User.fromMap(result.first);
+      // my method
+//      User user = User.fromMap(result.first);
+//      return user;
+      //the video method
+      return User.fromMap(result.first);
       // used first as in the video and it removed the error where
       // the SDK showed future<List<Map<String, dynamic>>> cannot be used as a Map
-      return user;
     } else {
       return null;
     }
@@ -91,9 +95,16 @@ class DbHelper {
 
   Future<int> getUsersCount() async {
     var dbClient = await db;
-    String Sql = "SELECT COUNT(1) FROM $tableName";
-    var result = await dbClient.rawQuery(Sql);
-    int count = Sqflite.firstIntValue(result);
+    String Sql = "SELECT COUNT(1) FROM $tableName"; // prepare the query
+    var result = await dbClient.rawQuery(Sql); // run the query and get the List
+    int count = Sqflite.firstIntValue(
+        result); // gets the first integer of the result (in this case it's the count)
     return count;
+  }
+
+  Future close() async {
+    // always close DB after use
+    var dbClient = await db;
+    return dbClient.close();
   }
 }
