@@ -39,9 +39,9 @@ class DbHelper {
     return newDB;
   }
 
-  void _onCreate(Database db, int newVersion) async {
-    await db.execute(
-        "CREATE TABLE $tableName ($columnID INTEGER PRIMARY KEY , $columnName TEXT , $columnPass TEXT)");
+  void _onCreate(Database _db, int newVersion) async {
+    await _db.execute(
+        "CREATE TABLE $tableName ($columnID INTEGER PRIMARY KEY NOT NULL, $columnName TEXT NOT NULL , $columnPass TEXT NOT NULL)");
   }
 
   Future<int> saveUser(User user) async {
@@ -50,7 +50,10 @@ class DbHelper {
     //String Sql = "INSERT INTO $tableName "; // if we want to create the query manually
     //if you want to create the map manually
     //Map newUser = {"name": "islam", "pass": "123"};
-    result = await dbClient.insert(tableName, user.toMap());
+    print("in save user " + user.toString());
+    var userMap = user.toMap(); // convert to Map <String , dynamic>
+    result = await dbClient.insert(tableName, userMap);
+    var users = getAllUsers();
     return result;
   }
 
@@ -63,20 +66,30 @@ class DbHelper {
 
   Future<int> deleteUser(int id) async {
     var dbClient = await db;
-    int result = await dbClient
-        .delete(tableName, where: '$columnID = ?', whereArgs: [id]);
-    String Sql = "";
-    return result;
+    int result;
+    if (id != null) {
+      result = await dbClient
+          .delete(tableName, where: '$columnID = ?', whereArgs: [id]);
+      return result;
+    } else {
+      await dbClient.rawQuery("DELETE FROM $tableName ");
+      print("id is null in delete");
+      return 0;
+    }
   }
 
   Future<User> retrieveUser(int id) async {
     var dbClient = await db;
-    String Sql = "SELECT * FROM $tableName WHERE $columnID = $id";
-    var result = await dbClient.rawQuery(Sql);
+    if (id == null) {
+      print("The ID is null, cannot find user with Id null");
+      var nullResult = await dbClient
+          .rawQuery("SELECT * FROM $tableName WHERE $columnID is null");
+      return User.fromMap(nullResult.first);
+    }
+    String sql = "SELECT * FROM $tableName WHERE $columnID = $id";
+    var result = await dbClient.rawQuery(sql);
     if (result.length != 0) {
-      // my method
-//      User user = User.fromMap(result.first);
-//      return user;
+      // my method return user = User.fromMap(result.first);
       //the video method
       return User.fromMap(result.first);
       // used first as in the video and it removed the error where
@@ -88,15 +101,19 @@ class DbHelper {
 
   Future<List> getAllUsers() async {
     var dbClient = await db;
-    String Sql = "SELECT * FROM $tableName";
-    var users = await dbClient.rawQuery(Sql);
+    String sql = "SELECT * FROM $tableName";
+    var users = await dbClient.rawQuery(sql);
+    for (int i = 0; i < users.length; i++) {
+      User user = User.map(users[i]);
+      print("in get all users " + user.toString());
+    }
     return users;
   }
 
   Future<int> getUsersCount() async {
     var dbClient = await db;
-    String Sql = "SELECT COUNT(1) FROM $tableName"; // prepare the query
-    var result = await dbClient.rawQuery(Sql); // run the query and get the List
+    String sql = "SELECT COUNT(1) FROM $tableName"; // prepare the query
+    var result = await dbClient.rawQuery(sql); // run the query and get the List
     int count = Sqflite.firstIntValue(
         result); // gets the first integer of the result (in this case it's the count)
     return count;
