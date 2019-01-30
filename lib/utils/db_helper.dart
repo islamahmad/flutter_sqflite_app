@@ -41,7 +41,7 @@ class DbHelper {
 
   void _onCreate(Database _db, int newVersion) async {
     await _db.execute(
-        "CREATE TABLE $tableName ($columnID INTEGER PRIMARY KEY NOT NULL, $columnName TEXT NOT NULL , $columnPass TEXT NOT NULL)");
+        "CREATE TABLE $tableName($columnID INTEGER PRIMARY KEY, $columnName TEXT NOT NULL , $columnPass TEXT NOT NULL)");
   }
 
   Future<int> saveUser(User user) async {
